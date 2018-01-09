@@ -1,3 +1,8 @@
+"""
+[experimental]
+Try to find relevant feature points in image
+"""
+
 import numpy as np
 import cv2
 import argparse

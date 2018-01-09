@@ -1,3 +1,8 @@
+"""
+[in-progress]
+Train a classifier to predict person_id from given image
+"""
+
 import cv2
 import numpy as np
 import os
@@ -5,7 +10,7 @@ from pymongo import MongoClient
 
 client = MongoClient()
 db = client.biometry
-collection = db.ear_data_19_12_17
+collection = db.ear_data_09_01_18
 
 data = collection.find()
 
