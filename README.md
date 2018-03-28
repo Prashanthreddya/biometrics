@@ -10,6 +10,6 @@ Example `config.py`:
 connection_string = 'localhost:port/mydb'
 ami_img_dir = './dataset'
 ```
-The filenames have to be in the format `integerID_orientation_otherData.jpg`
-Eg: `001_left_ami.jpg`
+The filenames have to be in the format `integerID_orientation_otherData.jpg`<br/>Eg: `001_left_ami.jpg`
+
 Only the integer ID and orientation is indexed.
