@@ -2,7 +2,7 @@
 Biometric identification using pinna scan
 
 <h3>Requirements</h3>
-<h4>For `insert_mongo.py` :</h4>
+<h4>For insert_mongo.py :</h4>
 You need a `config.py` file in the same folder with the mongodb connection string and path to data.
 
 Example `config.py`:
