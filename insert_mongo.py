@@ -2,25 +2,33 @@
 Given directory of images, create mongodb collection of ear features and person_id
 """
 
-import cv2
 import numpy as np
 import os
 from pymongo import MongoClient
+import argparse
+from config import connection_string, ami_img_dir
+from tqdm import tqdm
 
-IMG_DIR = '~/biometrics/dataset/subset/'
+def store_data(IMG_DIR=ami_img_dir):
+    client = MongoClient(host=connection_string)
+    db = client.biometrics
+    collection = db.ear_data_ami
 
-client = MongoClient()
-db = client.biometry
-collection = db.ear_data_09_01_18
+    for f in tqdm(os.listdir(os.path.abspath(IMG_DIR))):
+        if f.endswith('.jpg'):
+            fname = os.path.basename(f).split('.')[0]
+            id, orientation, _ = fname.split('_')
+            id = int(id)
 
-for f in os.listdir(IMG_DIR):
-    if f.endswith('.jpg'):
-        data = cv2.imread(IMG_DIR+f,cv2.IMREAD_GRAYSCALE)
-        label = int(f[:3]) #ID of person in img, obtained from filename
+            result = collection.insert_one({"img_local_path":os.path.join(IMG_DIR,fname),"id":id, "orientation": orientation})
 
-        #TODO: detect_features
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--imgdir", help="Directory of source images")
+    args = parser.parse_args()
 
-        #TODO: Insert detected features into img_data instead of flattened image
-        result = collection.insert_one({"img_data":data.flatten().tolist()},{"person_id":label})
-
-        print f + " inserted"
+    IMG_DIR = args.imgdir
+    if IMG_DIR is not None and os.path.exists(IMG_DIR):
+        store_data(IMG_DIR)
+    else:
+        store_data()
