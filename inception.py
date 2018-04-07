@@ -22,50 +22,53 @@ def predict_inceptionv4(img_path):
 if __name__ == "__main__":
     img_dir = 'dataset/'
 
-    classes = []
-    class_count = {}
-    temp = 0
+    y_train = []
+    y_test = []
+    X_train = []
+    X_test = []
+
     results = []
-    filepaths = []
+
+    train_count = {}
+
     total_start_time = time()
-    i=0
-    print "Getting results..."
+    print "Creating model..."
     model = InceptionResNetV2()
+    print "Model created."
+
+    print "Testing in progress..."
     for filename in sorted(os.listdir(img_dir)):
         if filename.endswith('.jpg') and 'back' not in filename:
             id = int(filename.split('_')[0])
-
-            # Get paths of 3 images per ear ID
-            if id in class_count and class_count[id] < 3 or id not in class_count:
-                filepath = os.path.join(img_dir, filename)
-                if id not in class_count:
-                    class_count[id] = 1
-                else:
-                    class_count[id] += 1
-                results.append(predict_inceptionv4(filepath))
-
-        # Get total of 75 images from the set
-        if np.sum(np.array(class_count.values())) == 75:
-            break
-
-
-    if len(set(class_count.values())) != 1:
-        print "This logic doesn't quite work"
-        exit()
-
+            filepath = os.path.join(img_dir, filename)
+            results.append(predict_inceptionv4(filepath))
 
     #Organise results into two np arrays
     features = []
     for result in results:
-        classes.append(result[0])
-        features.append(result[1])
+        if train_count.get(result[0],0) < 2:
+            if result[0] in train_count:
+                train_count[result[0]] += 1
+            else:
+                train_count[result[0]] = 1
+            y_train.append(result[0])
+            X_train.append(result[1])
+        else:
+            y_test.append(result[0])
+            X_test.append(result[1])
+
     total_end_time = time()
 
-    classes = np.array(classes)
-    features = np.squeeze(np.array(features))
+    X_train = np.squeeze(np.array(X_train))
+    y_train = np.array(y_train)
+    X_test = np.squeeze(np.array(X_test))
+    y_test = np.array(y_test)
+
     print '-'*80
-    print "Classes: " + str(np.shape(classes))
-    print "Features: " + str(np.shape(features))
-    np.savez('inceptionv4_results.npz', classes=classes, features=features)
+    print "X_train: " + str(np.shape(X_train))
+    print "y_train: " + str(np.shape(y_train))
+    print "\nX_test: " + str(np.shape(X_test))
+    print "y_test: " + str(np.shape(y_test))
+    np.savez('inceptionv4_results.npz', X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
     print "Results saved in inceptionv4_results.npz"
     print "Total processing time: " + str((total_end_time - total_start_time)) + " seconds"
