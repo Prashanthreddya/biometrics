@@ -21,7 +21,7 @@ def predict_inceptionv4(img_path):
 
 if __name__ == "__main__":
     img_dir = 'dataset/'
-    features = np.empty((1,1000))
+
     classes = []
     class_count = {}
     temp = 0
@@ -55,13 +55,14 @@ if __name__ == "__main__":
 
 
     #Organise results into two np arrays
+    features = []
     for result in results:
         classes.append(result[0])
-        np.append(features, result[1])
-
+        features.append(result[1])
     total_end_time = time()
 
     classes = np.array(classes)
+    features = np.squeeze(np.array(features))
     print '-'*80
     print "Classes: " + str(np.shape(classes))
     print "Features: " + str(np.shape(features))
