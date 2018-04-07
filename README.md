@@ -1,3 +1,5 @@
+![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
+
 # Biometrics
 Biometric identification using pinna scan
 
@@ -14,7 +16,7 @@ The filenames have to be in the format `integerID_orientation_otherData.jpg`<br/
 
 Only the integer ID and orientation is indexed.
 
-<h3>InceptionResNetV2
+<h3>InceptionResNetV2</h3>
 
 `inception.py` generates `inceptionv4_results.npz` which contains two numpy arrays: `classes` and `features`.
 - `classes` is a 1D array of length 75 containing the image ids
@@ -22,7 +24,7 @@ Only the integer ID and orientation is indexed.
 
 3 images are processed for each image id.
 
-<h3>Visualising the network
+<h3>Visualising the network</h3>
 
 `visualise_cnn.py` displays a matplotlib visualisation of intermediate layers of the InceptionResNetV2 model for two ear samples.
 
