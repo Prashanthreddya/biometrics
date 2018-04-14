@@ -1,4 +1,4 @@
-![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
+![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)
 
 # Biometrics
 Biometric identification using pinna scan
@@ -33,3 +33,9 @@ Only the integer ID and orientation is indexed.
 <img src='images/inceptionv4_test_06042018_2152_2.png'>
 
 These files can be found under the `images/` directory.
+
+<h3>Relevant Scripts</h3>
+
+1. `train_test_split.py` is a helper script to separate the complete AMI ear dataset into the directory structure required for the model
+2. `transfer.py` is an experimental script to perform transfer learning
+3. `retrain.py` is the main script to retrain the InceptionResNetV2 model for our requirements ##WORK IN PROGRESS

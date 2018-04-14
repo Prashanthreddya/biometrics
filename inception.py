@@ -69,6 +69,6 @@ if __name__ == "__main__":
     print "y_train: " + str(np.shape(y_train))
     print "\nX_test: " + str(np.shape(X_test))
     print "y_test: " + str(np.shape(y_test))
-    np.savez('inceptionv4_results.npz', X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
-    print "Results saved in inceptionv4_results.npz"
+    np.savez('model_files/inceptionv4_results.npz', X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
+    print "Results saved in model_files/inceptionv4_results.npz"
     print "Total processing time: " + str((total_end_time - total_start_time)) + " seconds"
