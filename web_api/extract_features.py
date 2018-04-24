@@ -5,10 +5,15 @@ from keras import activations
 import numpy as np
 from time import time
 import os
+import logging
 
 from tqdm import tqdm
 
-def predict_inceptionv4(img_path, layer_name):
+print "Creating model..."
+model = InceptionResNetV2()
+print "Model created."
+
+def extract_features(img_path, layer_name='avg_pool'):
     start = time()
 
     image = load_img(img_path, target_size=(299, 299))
@@ -30,9 +35,6 @@ if __name__ == "__main__":
 
     layers = ['avg_pool']
     total_start_time = time()
-    print "Creating model..."
-    model = InceptionResNetV2()
-    print "Model created."
 
     filepaths = []
     for filename in sorted(os.listdir(img_dir)):
@@ -52,7 +54,7 @@ if __name__ == "__main__":
         train_count = {}
         print "Testing in progress for layer " + layer_name + "..."
         for filepath in tqdm(filepaths):
-            results.append(predict_inceptionv4(filepath, layer_name))
+            results.append(extract_features(filepath, layer_name))
 
         #Organise results into two np arrays
         features = []
