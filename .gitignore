@@ -4,3 +4,4 @@ dataset_bk/
 *.npy
 *.arff
 *.csv
+*.pkl

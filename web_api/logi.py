@@ -39,15 +39,36 @@ def predict(x_test):
     return (predicted_class[0], score[0])
 
 
-def train(x_train, y_train):
-    y_train = [y_train]*len(x_train)
+def validate():
+    data=np.load('../model_files/inceptionv4_results_avg_pool.npz')
+
+    x_test = data['X_test']
+    y_test = data['y_test']
+
     model = get_latest_model()
-    model = model.partial_fit(x_train, y_train)
-    save_model(model)
+
+    if model == None:
+        model = train_new_model()
+
+    preds = model.predict(x_test)
+
+    for i in range(len(preds)):
+        print "Predicted Class - ", preds[i], "; Actual Class - ", y_test[i]
+    score = metrics.accuracy_score(y_test, model.predict(x_test))
+    print "Multinomial Logistic regression Test Accuracy :: ", score
+
+    return score
+
 
 def save_model(model):
     timestamp = int(time.time())
     joblib.dump(model, os.path.join(model_dir, model_name%timestamp))
+
+def retrain_model(x_train, y_train):
+    y_train = [y_train]*len(x_train)
+    model = get_latest_model()
+    return create_model(x_train, y_train)
+
 
 def train_new_model():
     data=np.load('../model_files/inceptionv4_results_avg_pool.npz')
@@ -56,9 +77,10 @@ def train_new_model():
     train_y=data['y_train']
 
     # Train multinomial logistic regression model
-    mul_lr = linear_model.LogisticRegression(multi_class='ovr', solver='liblinear').fit(train_x, train_y)
-    save_model(mul_lr)
-    return mul_lr
+    return create_model(train_x, train_y)
 
-if __name__ == "__main__":
-    main()
+def create_model(train_x, train_y):
+    mul_lr = linear_model.LogisticRegression(multi_class='ovr', solver='liblinear').fit(train_x, train_y)
+    score = metrics.accuracy_score(train_y, mul_lr.predict(train_x))
+    save_model(mul_lr)
+    return score

@@ -1,0 +1,29 @@
+{% extends 'sidebar_template.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block path %}
+<li><a href="biometrics">Dashboard</a></li>
+<li><a href="#">Visualise</a></li>
+<li><a href="#">View dataset</a></li>
+<li class="active">{{ type }} dataset</li>
+{% endblock %}
+{% block content %}
+        <div class="content mt-3">
+            <div class="animated fadeIn">
+
+                <div class="row">
+                    {% for tuple_row in data | batch(6, '&nbsp;') %}
+                        <div class="row">
+                            {% for tuple in tuple_row %}
+                            <div class="col" align=center>
+                                <section class="card">
+                                    <div class="card-body text-secondary"><img src="{{ tuple[1] }}" /></div>
+                                    <label>{{ tuple[0] }}</label>
+                                </section>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+{% endblock %}

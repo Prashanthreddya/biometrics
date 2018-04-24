@@ -7,9 +7,12 @@ from jinja2 import Environment, FileSystemLoader
 from werkzeug.exceptions import HTTPException
 from werkzeug.routing import Map, Rule
 from werkzeug.wrappers import Request, Response
+from pymongo import MongoClient
 
 from extract_features import *
 from logi import *
+from config import *
+from tqdm import tqdm
 
 import sys
 sys.path.append(os.environ['HOME'])
@@ -29,7 +32,10 @@ def convert(data):
 class BiometricServer(object):
     def __init__(self):
         self.url_map = Map([
-            Rule('/biometrics', endpoint='biometrics_api')
+            Rule('/biometrics', endpoint='biometrics_api'),
+            Rule('/view-<any(train, validation):type>', endpoint='view_dataset'),
+            Rule('/retrain-model', endpoint='retrain_model'),
+            Rule('/run-validation', endpoint='validate_model')
         ])
 
         template_path = os.path.join(os.path.dirname(__file__), 'templates')
@@ -57,31 +63,37 @@ class BiometricServer(object):
         print "Method: %s" % request.method
         print "Args: %s" % (str(request.form))
 
-        if request.method == 'POST' and len(request.form) > 0:
-            print "Posting...."
+        return self.render_template('index.html')
 
-            img_path = request.form.get('imgpath', None)
+    def view_dataset(self, request, type):
+        path = 'static/assets/dataset/' + type
+        data = []
+        client = MongoClient(host=CONNECTION_STRING)
+        db = client.biometric
 
-            id, features = extract_features(img_path)
-            (prediction,score) = predict(features)
-
-            name = get_name_from_id(prediction)
-
-            # response_data = json.dumps(response_data)
-            # response_data = convert(response_data)
-
-            return self.render_template('index.html',
-                                        prediction=prediction,
-                                        confidence=score,
-                                        name=name)
-
+        if type == 'train':
+            collection = db.train_set
         else:
-            print "Getting...."
-            return self.render_template('index.html',
-                                        search_hits=search_hits,
-                                        query_string=query_string,
-                                        hit_count=hit_count,
-                                        user_query=user_query)
+            collection = db.test_set
+
+        for img in tqdm(sorted(os.listdir(path))):
+            if img.endswith('.jpg') or img.endswith('.png'):
+                imgpath = os.path.join(path,img)
+                id = int(img.split('_')[0])
+                name = collection.find_one({'sample_class': id})["sample_name"]
+                data.append((name, imgpath))
+
+        return self.render_template('ui-grids.html', data=data, type=type)
+
+    def retrain_model(self, request):
+        score = train_new_model()
+
+        return self.render_template('complete.html', message="Training complete", score=score*100.0)
+
+    def validate_model(self, request):
+        score = validate()
+
+        return self.render_template('complete.html', message="Validation complete", score=score*100.0)
 
 
 def create_app():

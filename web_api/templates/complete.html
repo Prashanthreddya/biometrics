@@ -1,0 +1,12 @@
+{% extends 'sidebar_template.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block path %}
+<li><a href="biometrics">Dashboard</a></li>
+<li class="active">Retrain from scratch</li>
+{% endblock %}
+{% block content %}
+    <div class="animated fadeIn" align=center>
+        <img src='/static/images/check-green.png' width='250px' height='250px' /><br /><br />
+        <h4>{{ message }}. Accuracy: {{ score }} %</h4>
+    </div>
+{% endblock %}
