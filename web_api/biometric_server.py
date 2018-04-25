@@ -9,11 +9,11 @@ from jinja2 import Environment, FileSystemLoader
 from werkzeug.exceptions import HTTPException
 from werkzeug.routing import Map, Rule, redirect
 from werkzeug.wrappers import Request, Response
-from pymongo import MongoClient
 
 from extract_features import *
 from logi import *
 from config import *
+from ML_from_DB import *
 from tqdm import tqdm
 
 import sys
@@ -72,32 +72,29 @@ class BiometricServer(object):
     def view_dataset(self, request, type):
         path = 'static/assets/dataset/' + type
         data = []
-        client = MongoClient(host=CONNECTION_STRING)
-        db = client.biometric
 
-        if type == 'train':
-            collection = db.train_set
-        else:
-            collection = db.test_set
-
+        count = 0
         for img in tqdm(sorted(os.listdir(path))):
             if img.endswith('.jpg') or img.endswith('.png'):
                 imgpath = os.path.join(path,img)
                 id = int(img.split('_')[0])
-                name = collection.find_one({'sample_class': id})["sample_name"]
+                name = get_name_from_id(id)
                 data.append((name, imgpath))
+                count += 1
+                if count == 24:
+                    break
 
         return self.render_template('ui-grids.html', data=data, type=type)
 
     def retrain_model(self, request):
         score = train_new_model()
 
-        return self.render_template('complete.html', message="Training complete", score=score*100.0)
+        return self.render_template('complete.html', message="Training complete. Training accuracy:", score=score*100.0)
 
     def validate_model(self, request):
-        score = validate()
+        score, message = validate()
 
-        return self.render_template('complete.html', message="Validation complete", score=score*100.0)
+        return self.render_template('complete.html', message="Validation complete. Accuracy:", score=score*100.0, logs=message)
 
     def start_upload(self, request):
         return self.render_template('file_upload.html', message="Upload one image to retrieve details")
@@ -113,21 +110,21 @@ class BiometricServer(object):
 
         print "Extracting features..."
         _, features = extract_features(IMGPATH)
-        predicted_class, score_func = predict(features)
+        class_list, prob_func = predict(features)
 
-        client = MongoClient(host=CONNECTION_STRING)
-        db = client.biometric
-        collection = db.train_set
-        name = collection.find_one({'sample_class': predicted_class})["sample_name"]
-        score = np.array2string(score_func)
+        top_5_idx = prob_func.argsort()[-5:][::-1]
+        top_5_class = [class_list[i] for i in top_5_idx]
+        top_5_prob = [prob_func[i]*100 for i in top_5_idx]
+        top_5_names = [get_name_from_id(class_id) for class_id in top_5_class]
 
+        response = [(top_5_class[i], top_5_names[i], top_5_prob[i]) for i in xrange(5)]
         print '-'*80
-        print predicted_class
-        print name
-        print score
+        print top_5_class
+        print top_5_names
+        print top_5_prob
         print IMGPATH
 
-        return self.render_template('predicted_class.html', class_id=predicted_class, name=name, score=score, src=IMGPATH)
+        return self.render_template('predicted_class.html', response=response, src=IMGPATH)
 
 
 def create_app():

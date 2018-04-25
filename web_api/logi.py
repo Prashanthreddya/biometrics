@@ -7,6 +7,8 @@ from sklearn import linear_model
 from sklearn import metrics
 from sklearn.externals import joblib
 
+import ML_from_DB as mongo
+
 import time
 import os
 
@@ -34,16 +36,13 @@ def predict(x_test):
     if model == None:
         model = train_new_model()
 
-    predicted_class = model.predict(x_test)
-    score = model.decision_function(x_test)
-    return (predicted_class[0], score[0])
+    score = model.predict_proba(x_test)
+    return (model.classes_, score[0])
 
 
 def validate():
-    data=np.load('../model_files/inceptionv4_results_avg_pool.npz')
 
-    x_test = data['X_test']
-    y_test = data['y_test']
+    x_test, y_test = mongo.get_lists('test')
 
     model = get_latest_model()
 
@@ -52,12 +51,18 @@ def validate():
 
     preds = model.predict(x_test)
 
+    progress = []
     for i in range(len(preds)):
-        print "Predicted Class - ", preds[i], "; Actual Class - ", y_test[i]
-    score = metrics.accuracy_score(y_test, model.predict(x_test))
-    print "Multinomial Logistic regression Test Accuracy :: ", score
+        message = "Predicted Class - %d; Actual Class - %d" % (preds[i], y_test[i])
+        print message
+        progress.append(message)
 
-    return score
+    score = metrics.accuracy_score(y_test, model.predict(x_test))
+    message = "Multinomial Logistic regression Test Accuracy :: %f" % score
+    print message
+    progress.append(message)
+
+    return score, progress
 
 
 def save_model(model):
@@ -71,10 +76,7 @@ def retrain_model(x_train, y_train):
 
 
 def train_new_model():
-    data=np.load('../model_files/inceptionv4_results_avg_pool.npz')
-
-    train_x=data['X_train']
-    train_y=data['y_train']
+    train_x, train_y = mongo.get_lists('train')
 
     # Train multinomial logistic regression model
     return create_model(train_x, train_y)

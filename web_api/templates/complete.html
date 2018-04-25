@@ -1,4 +1,20 @@
 {% extends 'sidebar_template.html' %}
+{% block head %}
+<style>
+.jumbotron {
+    max-height: 300px;
+    overflow-y: scroll;
+    margin: 2%;
+    padding: 2%;
+    text-align: left;
+}
+.log {
+    line-height: 0px;
+    font-family: monospace;
+    font-size: 14px;
+}
+</style>
+{% endblock %}
 {% block title %}Dashboard{% endblock %}
 {% block path %}
 <li><a href="biometrics">Dashboard</a></li>
@@ -7,6 +23,14 @@
 {% block content %}
     <div class="animated fadeIn" align=center>
         <img src='/static/images/check-green.png' width='250px' height='250px' /><br /><br />
-        <h4>{{ message }}. Accuracy: {{ score }} %</h4>
+        <h4>{{ message }} {{ score }} %</h4>
+
+        {% if logs %}
+        <div class="jumbotron">
+            {% for line in logs %}
+            <p class="log">{{line}}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
 {% endblock %}
