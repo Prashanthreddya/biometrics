@@ -11,6 +11,30 @@ $(document).ready(function()
         e.preventDefault();
     });
 
+    document.getElementById("inputfile").onchange = function(e) {
+        var file = $(this)[0].files[0];
+        $("#drop-area").css('background', 'silver');
+        $(".drop-text").html('Predicting clas...');
+        e.preventDefault();
+
+        var reader = new FileReader();
+        reader.onload = function(){
+            var data = { 'file': reader.result };
+            $.ajax({
+                type: 'POST',
+                url: 'run-test',
+                data: data,
+                cache: false,
+                success: function(data){
+                    console.log(data);
+                    document.write(data);
+                }
+            });
+        };
+
+        reader.readAsDataURL(file);
+    };
+
     $("#drop-area").on('drop', function (e){
         $(this).css('background', 'silver');
         $(".drop-text").html('Predicting class...');
@@ -35,6 +59,7 @@ $(document).ready(function()
         };
 
         reader.readAsDataURL(file);
+
 
     });
 });
