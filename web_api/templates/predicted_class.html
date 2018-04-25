@@ -1,0 +1,32 @@
+{% extends 'sidebar_template.html' %}
+{% block head %}
+<style>
+
+.img {
+    padding: 5%;
+    max-height: 250px;
+    border: 5px dashed lightgrey;
+}
+</style>
+{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block path %}
+<li><a href="biometrics">Dashboard</a></li>
+<li class="active">Test</li>
+{% endblock %}
+{% block content %}
+<div class="content mt-3">
+        <div class="row">
+            <div class="col-md-3">
+                <div style="text-align:center;">
+                    <img class="img" src='{{ src }}' />
+                </div>
+            </div>
+            <div class="col-md-8" style="text-align:center; word-wrap: break-word;">
+                <h4>{{ name }}</h4> <br />
+                <h6>{{ class_id }}</h6> <br />
+                <code>{{ score }}</code>
+            </div>
+        </div>
+</div>
+{% endblock %}

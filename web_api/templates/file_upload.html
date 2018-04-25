@@ -1,11 +1,34 @@
 {% extends 'sidebar_template.html' %}
+{% block head %}
+<script type="text/javascript" src="static/assets/js/vendor/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="static/assets/js/upload_script.js"></script>
+<style>
+#drop-area {
+    display:table;
+    height:500px;
+    width:100%;
+    vertical-align:middle;
+    text-align:center;
+    border: 5px dashed lightgrey;
+}
+
+.drop-text {
+    vertical-align:middle;
+    display:table-cell;
+}
+</style>
+{% endblock %}
 {% block title %}Dashboard{% endblock %}
 {% block path %}
 <li><a href="biometrics">Dashboard</a></li>
 <li class="active">Test</li>
 {% endblock %}
 {% block content %}
-    <div id="drop-area">
-        <h3 class="drop-text">Drag and Drop Image Here</h3>
-    </div>
+<div class="content mt-3">
+        <div class="row">
+            <div id="drop-area">
+                <h3 class="drop-text">Drag and Drop Image Here</h3>
+            </div>
+        </div>
+</div>
 {% endblock %}
