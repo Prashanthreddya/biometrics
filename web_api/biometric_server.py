@@ -39,7 +39,8 @@ class BiometricServer(object):
             Rule('/retrain-model', endpoint='retrain_model'),
             Rule('/run-validation', endpoint='validate_model'),
             Rule('/start-upload', endpoint='start_upload'),
-            Rule('/run-test', endpoint='run_test')
+            Rule('/run-test', endpoint='run_test'),
+            Rule('/visualise-cnn', endpoint='visualise_cnn')
         ])
 
         template_path = os.path.join(os.path.dirname(__file__), 'templates')
@@ -125,6 +126,9 @@ class BiometricServer(object):
         print IMGPATH
 
         return self.render_template('predicted_class.html', response=response, src=IMGPATH)
+
+    def visualise_cnn(self, request):
+        return self.render_template('visualise_cnn.html')
 
 
 def create_app():

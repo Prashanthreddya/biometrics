@@ -1,0 +1,52 @@
+{% extends 'sidebar_template.html' %}
+{% block head %}
+<style>
+img {
+    max-height: 250px;
+}
+</style>
+{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block path %}
+<li><a href="biometrics">Dashboard</a></li>
+<li class="active">View ConvNet Activations</li>
+{% endblock %}
+{% block content %}
+    <div class="animated fadeIn" align=center>
+        <div class="row">
+            <table class="table table-bordered" style="text-align:center">
+                <thead>
+                    <tr>
+                        <th>Original Image</th>
+                        <th>Saliency Map</th>
+                        <th>Activation Heat Map</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="static/assets/dataset/validation/001_zoom_ear.jpg" />
+                        </td>
+                        <td>
+                            <img src="static/images/vis/001_saliency.png" />
+                        </td>
+                        <td>
+                            <img src="static/images/vis/001_heatmap.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <img src="static/assets/dataset/train/019_right_ear.jpg" />
+                        </td>
+                        <td>
+                            <img src="static/images/vis/19_saliency.png" />
+                        </td>
+                        <td>
+                            <img src="static/images/vis/19_heatmap.png" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
