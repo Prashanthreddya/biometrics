@@ -48,4 +48,8 @@ def mongo_add(dataset, s_class, features=None, name=None):
         collection.update({sample_class:s_class},{sample_name:name},{multi: True})
         pass
 
-    
+
+def get_next_class():
+    collection=client.biometric.train_set
+    next_class=collection.find_one(sort=[("sample_class",pymongo.DESCENDING)])["sample_class"]+1
+    return next_class
