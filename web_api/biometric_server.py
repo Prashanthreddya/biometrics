@@ -30,17 +30,26 @@ def convert(data):
     else:
         return str(data)
 
+def get_blob(b64_img):
+    img_dict = re.match("data:(?P<type>.*?);(?P<encoding>.*?),(?P<data>.*)", b64_img).groupdict()
+    blob = img_dict['data'].decode(img_dict['encoding'], 'strict')
+    return blob
+
 
 class BiometricServer(object):
     def __init__(self):
         self.url_map = Map([
             Rule('/biometrics', endpoint='biometrics_api'),
+            Rule('/index.html', endpoint='biometrics_api'),
+            Rule('/', endpoint='biometrics_api'),
             Rule('/view-<any(train, validation):type>', endpoint='view_dataset'),
             Rule('/retrain-model', endpoint='retrain_model'),
             Rule('/run-validation', endpoint='validate_model'),
             Rule('/start-upload', endpoint='start_upload'),
             Rule('/run-test', endpoint='run_test'),
-            Rule('/visualise-cnn', endpoint='visualise_cnn')
+            Rule('/visualise-cnn', endpoint='visualise_cnn'),
+            Rule('/add-new', endpoint='upload_datapoint'),
+            Rule('/add-datapoint', endpoint='add_datapoint'),
         ])
 
         template_path = os.path.join(os.path.dirname(__file__), 'templates')
@@ -68,7 +77,10 @@ class BiometricServer(object):
         print "Method: %s" % request.method
         print "Args: %s" % (str(request.form))
 
-        return self.render_template('index.html')
+        with open('static/assets/about.txt','r') as f:
+            content = f.read()
+
+        return self.render_template('index.html', about=content)
 
     def view_dataset(self, request, type):
         path = 'static/assets/dataset/' + type
@@ -90,24 +102,21 @@ class BiometricServer(object):
     def retrain_model(self, request):
         score = train_new_model()
 
-        return self.render_template('complete.html', message="Training complete. Training accuracy:", score=score*100.0)
+        return self.render_template('complete.html', message="Training complete. Training accuracy: %f %%"%(score*100.0))
 
     def validate_model(self, request):
         score, message = validate()
 
-        return self.render_template('complete.html', message="Validation complete. Accuracy:", score=score*100.0, logs=message)
+        return self.render_template('complete.html', message="Validation complete. Accuracy: %f %%"%(score*100), logs=message)
 
     def start_upload(self, request):
-        return self.render_template('file_upload.html', message="Upload one image to retrieve details")
+        return self.render_template('file_upload_single.html', message="Upload one image to retrieve details")
 
     def run_test(self, request):
         b64_img = request.form.get('file')
 
-        img_dict = re.match("data:(?P<type>.*?);(?P<encoding>.*?),(?P<data>.*)", b64_img).groupdict()
-        blob = img_dict['data'].decode(img_dict['encoding'], 'strict')
-
         with open(IMGPATH, "wb") as fh:
-            fh.write(blob)
+            fh.write(get_blob(b64_img))
 
         print "Extracting features..."
         _, features = extract_features(IMGPATH)
@@ -130,6 +139,42 @@ class BiometricServer(object):
     def visualise_cnn(self, request):
         return self.render_template('visualise_cnn.html')
 
+    def upload_datapoint(self, request):
+        return self.render_template('file_upload_multiple.html', class_id=get_next_class())
+
+    def add_datapoint(self, request):
+        print request.form.keys()
+        files = json.loads(request.form.get('files'))
+        class_id = int(request.form.get('class_id'))
+        name = request.form.get('name')
+
+        print "-"*100
+        print len(request.form)
+        print len(files)
+        print type(files[0])
+        print class_id
+        print '-'*100
+        print "Getting features for %d files"%len(files)
+        num = 0
+        all_features = []
+
+        # traverse through training files to get features
+        for file in files:
+            blob = get_blob(file)
+            with open(IMGPATH, 'wb') as f:
+                f.write(blob)
+            print "\tGetting features for image %d..."%num
+            _, features = extract_features(IMGPATH)
+            all_features.append([features])
+
+            num += 1
+
+        all_features = np.squeeze(all_features)
+
+        mongo_add('train', class_id, all_features, name)
+
+        message=(("%d files uploaded. Array shape = "+str(np.shape(all_features)))%num)
+        return Response(message)
 
 def create_app():
     server = BiometricServer()

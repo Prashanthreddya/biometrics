@@ -1,0 +1,3 @@
+This tool provides an interface to interact with the models that have been trained to identify the differences between human ears. The system learns a human ear from just 4 sample images and can then predict the identity of a person from a new image of their ear which has not been seen earlier.
+
+It makes use of a convolutional neural network, namely the pre-trained InceptionResNetV2 architecture created by Google. The output vector of the last pooling layer of the pre-trained neural network is used as the feature vector for training a multinomial logistic regression model. The model is created using stochastic gradient descent with logarithmic loss. The model has been trained with 4 images per person for 100 unique individuals using the AMI dataset. 

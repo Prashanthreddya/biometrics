@@ -14,7 +14,7 @@ $(document).ready(function()
     document.getElementById("inputfile").onchange = function(e) {
         var file = $(this)[0].files[0];
         $("#drop-area").css('background', 'silver');
-        $(".drop-text").html('Predicting clas...');
+        $(".drop-text").html('Predicting class...');
         e.preventDefault();
 
         var reader = new FileReader();

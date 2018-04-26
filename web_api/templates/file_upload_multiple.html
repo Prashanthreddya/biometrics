@@ -1,7 +1,7 @@
 {% extends 'sidebar_template.html' %}
 {% block head %}
 <script type="text/javascript" src="static/assets/js/vendor/jquery-2.1.4.min.js"></script>
-<script type="text/javascript" src="static/assets/js/upload_script.js"></script>
+<script type="text/javascript" src="static/assets/js/upload_multiple_script.js"></script>
 <meta http-equiv="cache-control" content="max-age=0">
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="expires" content="-1">
@@ -26,15 +26,31 @@
 {% block title %}Dashboard{% endblock %}
 {% block path %}
 <li><a href="biometrics">Dashboard</a></li>
-<li class="active">Test</li>
+<li><a href="#">Train</a></li>
+<li class="active">Add datapoint</li>
 {% endblock %}
 {% block content %}
 <div class="content mt-3">
-        <div class="row">
-            <input type="file" id="inputfile" accept="image/*"/><br /><br />
-            <div id="drop-area">
-                <h3 class="drop-text">Drag and Drop Image Here</h3>
-            </div>
+    <div class="row">
+        <h5>Class ID: <span class="class_id">{{ class_id }}</span></h5>
+    </div>
+    <br />
+
+    <div class="row form-control">
+        <label>Name: </label>
+        <input type="text" id="inputname" style="border:None;"/>
+    </div>
+    <br />
+
+    <div class="row">
+        <input type="file" id="inputfile" accept="image/*"/ multiple>
+    </div>
+    <br />
+
+    <div class="row">
+        <div id="drop-area">
+            <h3 class="drop-text"></h3>
         </div>
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'sidebar_template.html' %}
+{% block head %}
+<script type="text/javascript" src="static/assets/js/vendor/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="static/assets/js/upload_single_script.js"></script>
+<meta http-equiv="cache-control" content="max-age=0">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="-1">
+<meta http-equiv="expires" content="Tue, 01 Jan 1980 11:00:00 GMT">
+<meta http-equiv="pragma" content="no-cache">
+<style>
+#drop-area {
+    display:table;
+    height:500px;
+    width:100%;
+    vertical-align:middle;
+    text-align:center;
+    border: 5px dashed lightgrey;
+}
+
+.drop-text {
+    vertical-align:middle;
+    display:table-cell;
+}
+</style>
+{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block path %}
+<li><a href="biometrics">Dashboard</a></li>
+<li class="active">Test</li>
+{% endblock %}
+{% block content %}
+<div class="content mt-3">
+        <div class="row">
+            <input type="file" id="inputfile" accept="image/*"/><br /><br />
+            <div id="drop-area">
+                <h3 class="drop-text">Drag and Drop Image Here</h3>
+            </div>
+        </div>
+</div>
+{% endblock %}
