@@ -28,3 +28,18 @@ def get_lists(s):
 
 def get_name_from_id(id):
     return client.biometric.train_set.find_one({'sample_class': id})["sample_name"]
+
+def mongo_add(dataset, sample_class, features=None, name=None):
+    if dataset=='train':
+        collection = client.biometric.train_set
+    else:
+        collection = client.biometric.test_set
+
+    if name is not None:
+        # collection.update({'sample_class':sample_class}, {"sample_name":sample_name})
+        pass
+
+    if features is not None:
+        for feature_array in features:
+            # collection.insert_one({sample_class:sample_class, features:features})
+            pass
